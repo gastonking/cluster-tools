@@ -76,7 +76,7 @@ Profesional orientado a la arquitectura, administración y optimización de plat
 
 * 🌐 **GitHub:** [gastonking/cluster-tools](https://github.com/gastonking/cluster-tools.git)
 * 💼 **LinkedIn:** [gastonrey79](https://www.linkedin.com/in/gastonrey79/)
-* 📄 **Curriculum Vitae:** [Ver CV Completo](./CV_Jorge_Gaston_Rey.md)
+* 📄 **Curriculum Vitae:** [Ver CV Completo](https://github.com/gastonking/cluster-tools/blob/main/gastonrey-cv/readme.md)
 * 💡 **Filosofía:** *"Si tenés que repetir un comando más de dos veces, automatizalo."*
 
 ---
