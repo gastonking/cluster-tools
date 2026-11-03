@@ -25,17 +25,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Descargar Firefox oficial (formato actual .tar.xz)
+# Descargar e instalar Firefox
 RUN wget -O /tmp/firefox.tar.xz \
     "https://download.mozilla.org/?product=firefox-latest&os=linux64&lang=en-US" \
     && tar -xJf /tmp/firefox.tar.xz -C /opt/ \
     && ln -s /opt/firefox/firefox /usr/local/bin/firefox \
     && rm /tmp/firefox.tar.xz
 
-# Crear usuario no root
-RUN useradd -m -s /bin/bash $USER
+# Crear usuario no-root appuser y asignar permisos
+RUN useradd -m -s /bin/bash $USER \
+    && mkdir -p /home/$USER/.vnc \
+    && chown -R $USER:$USER /home/$USER
 
-# Configuración supervisor
+# Copiar la configuración del gestor de procesos
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 EXPOSE 6080

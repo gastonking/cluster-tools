@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  firefox-headless:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: firefox-browser
+    ports:
+      - "6080:6080"
+    shm_size: '2gb'
+    restart: unless-stopped
+    environment:
+      - DISPLAY=:1
