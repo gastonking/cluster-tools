@@ -1,0 +1,748 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Jorge Gastón Rey</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Sora:wght@500;600;700&display=swap">
+<style>
+/* Layout: tablero de operaciones editorial. Un hero con red de nodos, selector de rol que reordena y resalta todo el resto (habilidades, línea de tiempo, trayectoria). */
+:root{
+  --bg:#f3f6f9; --surface:#ffffff; --surface-2:#e8eef5; --ink:#0e1a2b; --muted:#465a72; --line:#d3dde8;
+  --accent:#0a7587; --accent-ink:#ffffff; --accent-soft:#d9f0f4;
+  --warm:#8a5208; --warm-soft:#fbeccb; --bar:#a9b9ca;
+  --shadow:0 1px 2px rgba(14,26,43,.06),0 10px 28px rgba(14,26,43,.07);
+  --f-display:'Sora',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a1220; --surface:#111d30; --surface-2:#17263b; --ink:#e8eff8; --muted:#a2b3c8; --line:#243750;
+    --accent:#46c9dd; --accent-ink:#04222a; --accent-soft:#0f3441;
+    --warm:#f2b45a; --warm-soft:#3a2b0e; --bar:#3a4f69;
+    --shadow:0 1px 2px rgba(0,0,0,.35),0 10px 28px rgba(0,0,0,.35);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a1220; --surface:#111d30; --surface-2:#17263b; --ink:#e8eff8; --muted:#a2b3c8; --line:#243750;
+  --accent:#46c9dd; --accent-ink:#04222a; --accent-soft:#0f3441;
+  --warm:#f2b45a; --warm-soft:#3a2b0e; --bar:#3a4f69;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 10px 28px rgba(0,0,0,.35);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.6 var(--f-body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--bg)}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.02em;line-height:1.15}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1160px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+section{scroll-margin-top:104px}
+.eyebrow{font:500 .75rem/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.sec{padding-block:72px 8px}
+.sec-head{display:grid;gap:12px;margin-bottom:28px;max-width:720px}
+.sec-head h2{font-size:clamp(1.7rem,3.6vw,2.5rem)}
+.sec-head p{color:var(--muted);font-size:1.05rem}
+
+/* NAV */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;min-height:56px;padding-block:8px}
+.brand{display:flex;align-items:center;gap:10px;font:600 .95rem var(--f-display);text-decoration:none;color:var(--ink);margin-right:auto}
+.mono-badge{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:var(--accent);color:var(--accent-ink);font:700 .8rem var(--f-display)}
+.nav-links{display:flex;gap:2px;overflow-x:auto;order:3;width:100%;scrollbar-width:none}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{white-space:nowrap;text-decoration:none;color:var(--muted);font-weight:500;font-size:.9rem;padding:.4rem .7rem;border-radius:8px}
+.nav-links a:hover{color:var(--ink);background:var(--surface-2)}
+.nav-links a.active{color:var(--accent);background:var(--accent-soft)}
+.role-pill{font:500 .75rem var(--f-mono);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:.38rem .75rem;max-width:46vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.role-pill b{color:var(--accent);font-weight:500}
+.icon-btn{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.icon-btn:hover{border-color:var(--accent)}
+@media (min-width:900px){.nav-links{order:0;width:auto}.nav .wrap{flex-wrap:nowrap}.brand{margin-right:0}.nav .spacer{flex:1}}
+
+/* HERO */
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+#net{position:absolute;inset:0;z-index:0;opacity:.55;-webkit-mask-image:linear-gradient(to bottom,#000 55%,transparent);mask-image:linear-gradient(to bottom,#000 55%,transparent)}
+.hero .wrap{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.8fr);gap:40px;padding-block:64px 56px;align-items:center}
+.hero-copy{display:grid;gap:22px;animation:rise .7s ease both}
+.hero h1{font-size:clamp(2.5rem,7vw,4.6rem);font-weight:700;letter-spacing:-.035em}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.lead{font-size:clamp(1.1rem,2vw,1.3rem);line-height:1.5;max-width:34em}
+.sub{color:var(--muted);max-width:38em}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:4px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:.8rem 1.2rem;border-radius:12px;font-weight:600;text-decoration:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);transition:transform .2s,border-color .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:var(--shadow)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.facts{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow);animation:rise .7s .12s ease both}
+.facts h2{font:500 .75rem var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.big{font:700 clamp(2.6rem,6vw,3.6rem)/1 var(--f-display);letter-spacing:-.04em;color:var(--accent)}
+.big small{font:500 1rem var(--f-body);letter-spacing:0;color:var(--muted);margin-left:8px}
+.facts dl{margin:16px 0 0;display:grid;gap:0}
+.facts .row{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:11px 0;border-top:1px solid var(--line);font-size:.92rem}
+.facts dt{color:var(--muted)}
+.facts dd{margin:0;font-weight:500}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (max-width:899px){.hero .wrap{grid-template-columns:minmax(0,1fr);padding-block:40px}}
+
+/* ROLES */
+.role-tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:10px}
+.role-btn{display:grid;gap:3px;text-align:left;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:var(--surface);transition:transform .2s,border-color .2s,background .2s}
+.role-btn:hover{transform:translateY(-2px);border-color:var(--accent)}
+.rb-t{font:600 .98rem var(--f-display)}
+.rb-h{font-size:.82rem;color:var(--muted)}
+.role-btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent)}
+.role-btn[aria-pressed="true"] .rb-t,.role-btn[aria-pressed="true"] .rb-h{color:var(--accent-ink)}
+.role-panel{margin-top:18px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:28px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:clamp(20px,3.4vw,36px);box-shadow:var(--shadow)}
+.role-panel.flash{animation:flash .45s ease}
+@keyframes flash{from{opacity:.25;transform:translateY(8px)}to{opacity:1;transform:none}}
+.rp-left{display:grid;gap:14px;align-content:start;min-width:0}
+.rp-left h3{font-size:clamp(1.3rem,2.4vw,1.75rem)}
+.rp-simple{font-size:1.12rem;line-height:1.55}
+.tag-label{font:500 .72rem var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.rp-right{display:grid;gap:14px;align-content:start;min-width:0}
+.points{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.points li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;align-items:start}
+.points svg{width:22px;height:22px;color:var(--accent);margin-top:2px}
+.rp-keys,.rp-jobs{display:flex;flex-wrap:wrap;gap:8px}
+.count{color:var(--muted);font-size:.9rem}
+@media (max-width:899px){.role-panel{grid-template-columns:minmax(0,1fr)}}
+
+/* CHIPS */
+.chip{display:inline-flex;align-items:center;font:500 .875rem var(--f-body);padding:.45rem .85rem;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);transition:transform .18s,border-color .18s,background .18s}
+.chip:hover{border-color:var(--accent);transform:translateY(-1px)}
+.chip.rel::before,.chip.key::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);margin-right:.5rem}
+.chip.rel,.chip.key{background:var(--accent-soft);border-color:var(--accent)}
+.chip.dim{color:var(--muted);border-style:dashed}
+.chip.sel{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip.sel::before{background:var(--accent-ink)}
+.chip.pop{animation:pop .5s ease}
+@keyframes pop{40%{transform:scale(1.07)}}
+.chip.link{border-radius:10px}
+
+/* SKILLS */
+.toolbar{display:grid;gap:14px;margin-bottom:22px}
+.search{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:0 14px;max-width:520px}
+.search:focus-within{border-color:var(--accent)}
+.search svg{width:18px;height:18px;color:var(--muted);flex:none}
+.search input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:inherit;padding:.8rem 0;outline:none}
+.cat-filter{display:flex;flex-wrap:wrap;gap:8px}
+.legend{display:flex;flex-wrap:wrap;gap:16px;color:var(--muted);font-size:.85rem}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.dot.o{background:transparent;border:1px dashed var(--muted)}
+.skills-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:28px;align-items:start}
+.groups{display:grid;gap:22px;min-width:0}
+.group{display:grid;gap:10px}
+.group header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.group h3{font-size:1.05rem}
+.group header span{color:var(--muted);font-size:.88rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.empty{padding:28px;border:1px dashed var(--line);border-radius:14px;color:var(--muted)}
+.detail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 112px);background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow);display:grid;gap:12px;min-width:0}
+.detail h3{font-size:1.4rem}
+.detail .plain{font-size:1.02rem}
+.detail .close{display:none}
+.detail .meta{display:grid;gap:8px}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{font:500 .78rem var(--f-body);padding:.25rem .6rem;border-radius:8px;background:var(--surface-2);color:var(--ink);border:0}
+button.pill:hover{background:var(--accent-soft)}
+.pill.warm{background:var(--warm-soft);color:var(--warm)}
+@media (max-width:899px){
+  .skills-layout{grid-template-columns:minmax(0,1fr)}
+  .detail{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:35;border-radius:18px 18px 0 0;max-height:62vh;overflow:auto;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateY(110%);visibility:hidden;transition:transform .3s ease,visibility .3s}
+  .detail.open{transform:none;visibility:visible}
+  .detail .close{display:grid;position:absolute;top:10px;right:max(12px,env(safe-area-inset-right,0px));width:34px;height:34px;place-items:center;border-radius:10px;border:1px solid var(--line);background:var(--surface-2)}
+}
+
+/* TIMELINE */
+.gantt{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:clamp(14px,2.4vw,24px);box-shadow:var(--shadow);margin-bottom:26px;display:grid;gap:4px}
+.g-axis{display:grid;grid-template-columns:210px minmax(0,1fr);gap:14px;margin-bottom:6px}
+.g-ticks{position:relative;height:22px;font:500 .72rem var(--f-mono);color:var(--muted)}
+.g-ticks span{position:absolute;transform:translateX(-50%);top:0}
+.g-row{display:grid;grid-template-columns:210px minmax(0,1fr);gap:14px;align-items:center;padding:7px 8px;margin-inline:-8px;border-radius:10px;border:0;background:transparent;text-align:left;width:calc(100% + 16px)}
+.g-row:hover{background:var(--surface-2)}
+.g-label{display:grid;min-width:0}
+.g-label b{font-weight:600;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-label small{color:var(--muted);font:400 .74rem var(--f-mono)}
+.g-track{position:relative;height:14px;background:var(--surface-2);border-radius:999px}
+.g-row:hover .g-track{background:var(--bg)}
+.g-bar{position:absolute;top:0;bottom:0;border-radius:999px;background:var(--bar);transform-origin:left;animation:grow .9s ease both}
+.g-bar.rel{background:var(--accent)}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.g-note{color:var(--muted);font-size:.85rem;margin-top:8px}
+@media (max-width:700px){.g-axis{grid-template-columns:minmax(0,1fr)}.g-axis>div:first-child{display:none}.g-row{grid-template-columns:minmax(0,1fr);gap:6px}}
+.jobs{display:grid;gap:14px}
+.job{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(16px,2.6vw,24px);display:grid;gap:12px;transition:border-color .2s,background .2s;scroll-margin-top:110px}
+.job.rel{background:var(--accent-soft);border-color:var(--accent)}
+.job.hl{animation:hl 1.4s ease}
+@keyframes hl{0%,60%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:none}}
+.job-top{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;justify-content:space-between}
+.job h3{font-size:1.2rem}
+.job .role{font-weight:500;color:var(--muted)}
+.job .period{font:500 .8rem var(--f-mono);color:var(--muted)}
+.badges{display:flex;flex-wrap:wrap;gap:6px}
+.badge{font:500 .72rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:.25rem .55rem;border-radius:6px;background:var(--accent);color:var(--accent-ink)}
+.badge.warm{background:var(--warm-soft);color:var(--warm)}
+.job .plain{font-size:1.02rem}
+.toggle{justify-self:start;display:inline-flex;gap:8px;align-items:center;border:0;background:transparent;color:var(--accent);font-weight:600;padding:2px 0}
+.toggle svg{width:16px;height:16px;transition:transform .2s}
+.toggle[aria-expanded="true"] svg{transform:rotate(180deg)}
+.job-more{display:grid;gap:14px}
+.job-more[hidden]{display:none}
+.job-more ul{margin:0;padding-left:1.1rem;display:grid;gap:6px;color:var(--ink)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font:400 .75rem var(--f-mono);padding:.2rem .5rem;border-radius:6px;background:var(--surface-2);color:var(--muted)}
+.job.rel .tag{background:var(--surface)}
+
+/* CERTS */
+.certs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.cert{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:8px;align-content:start;transition:transform .2s,border-color .2s}
+.cert:hover{transform:translateY(-2px);border-color:var(--accent)}
+.cert .area{font:500 .7rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.cert h3{font:600 1rem/1.35 var(--f-body);letter-spacing:0}
+.cert p{color:var(--muted);font-size:.88rem}
+.cert.feat{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.cert.feat .area,.cert.feat p{color:var(--accent-ink)}
+.edu{margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.edu>div{background:var(--surface-2);border-radius:14px;padding:16px;display:grid;gap:4px}
+.edu b{font-family:var(--f-display)}
+.edu span{color:var(--muted);font-size:.92rem}
+
+/* CONTACT */
+.contact{margin-top:72px;background:var(--surface-2);border-block:1px solid var(--line)}
+.contact .wrap{padding-block:64px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:36px}
+.contact h2{font-size:clamp(1.9rem,4vw,2.8rem)}
+.contact p.lead2{color:var(--muted);margin-top:14px;font-size:1.05rem;max-width:30em}
+.c-list{display:grid;gap:10px}
+.c-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.c-item small{display:block;font:500 .7rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.c-item span.v{font-weight:500;overflow-wrap:anywhere;user-select:all}
+.c-item .btn{padding:.5rem .85rem;font-size:.85rem;border-radius:10px}
+.c-static{grid-template-columns:minmax(0,1fr)}
+@media (max-width:899px){.contact .wrap{grid-template-columns:minmax(0,1fr)}}
+footer{padding-block:28px;color:var(--muted);font-size:.88rem}
+footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:.6rem 1rem;border-radius:10px;font-size:.9rem;opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:calc(100vw - 32px)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+</style>
+
+<script>
+try{var t=localStorage.getItem('gr-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}
+</script>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#inicio" aria-label="Inicio"><span class="mono-badge">GR</span><span>Gastón Rey</span></a>
+    <nav class="nav-links" aria-label="Secciones">
+      <a href="#roles" data-sec="roles">Rol buscado</a>
+      <a href="#habilidades" data-sec="habilidades">Habilidades</a>
+      <a href="#trayectoria" data-sec="trayectoria">Trayectoria</a>
+      <a href="#formacion" data-sec="formacion">Formación</a>
+      <a href="#contacto" data-sec="contacto">Contacto</a>
+    </nav>
+    <span class="spacer"></span>
+    <a class="role-pill" id="navRole" href="#roles">Viendo: <b>Vista general</b></a>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Cambiar entre tema claro y oscuro">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="inicio">
+<section class="hero" aria-labelledby="h1">
+  <canvas id="net" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="hero-copy">
+      <span class="eyebrow">SRE · Cloud · Linux · Operaciones IT</span>
+      <h1 id="h1">Jorge Gastón <em>Rey</em></h1>
+      <p class="lead">Me ocupo de que los sistemas de una empresa funcionen siempre, se mantengan seguros y no gasten de más.</p>
+      <p class="sub">Más de 20 años en infraestructura crítica, operaciones IT y soporte técnico. Busco posiciones de SRE, Cloud Engineer, Administrador Linux, Jefe de Soporte o Jefe de Operaciones.</p>
+      <div class="cta">
+        <a class="btn primary" href="#roles">Ver mi perfil según el rol</a>
+        <a class="btn" href="#contacto">Contacto</a>
+      </div>
+    </div>
+    <aside class="facts" aria-label="Perfil de un vistazo">
+      <h2>Perfil de un vistazo</h2>
+      <div class="big">20+<small>años en tecnología</small></div>
+      <dl>
+        <div class="row"><dt>Último rol</dt><dd>SRE en Swiss Medical (2025 – 2026)</dd></div>
+        <div class="row"><dt>En paralelo</dt><dd>DevOps en Jefatura de Gabinete de Ministros, desde 2021</dd></div>
+        <div class="row"><dt>Nubes</dt><dd>AWS · Google Cloud · Azure</dd></div>
+        <div class="row"><dt>Certificación</dt><dd>Google Professional Cloud DevOps Engineer (04/2026)</dd></div>
+        <div class="row"><dt>Ubicación</dt><dd>Buenos Aires, Argentina</dd></div>
+      </dl>
+    </aside>
+  </div>
+</section>
+
+<section id="roles" class="sec" aria-labelledby="roles-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Rol buscado</span>
+      <h2 id="roles-h">¿Qué puesto estás cubriendo?</h2>
+      <p>Elegí un rol y toda la página resalta lo que más importa para ese puesto: habilidades, línea de tiempo y experiencia.</p>
+    </div>
+    <div class="role-tabs" id="roleTabs" role="group" aria-label="Elegir rol"></div>
+    <div class="role-panel" id="rolePanel" aria-live="polite">
+      <div class="rp-left">
+        <span class="tag-label">En simple</span>
+        <h3 id="rpTitle"></h3>
+        <p class="rp-simple" id="rpSimple"></p>
+        <span class="tag-label">Experiencia más relevante</span>
+        <div class="rp-jobs" id="rpJobs"></div>
+      </div>
+      <div class="rp-right">
+        <span class="tag-label">Lo que respalda este perfil</span>
+        <ul class="points" id="rpPoints"></ul>
+        <span class="tag-label">Habilidades clave (tocá una para ver qué significa)</span>
+        <div class="rp-keys" id="rpKeys"></div>
+        <p class="count" id="rpCount"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="habilidades" class="sec" aria-labelledby="hab-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Mapa de habilidades</span>
+      <h2 id="hab-h">Qué sé hacer, explicado sin tecnicismos</h2>
+      <p>Cada habilidad tiene una explicación corta y muestra en qué trabajos la apliqué. Podés buscar por nombre o por lo que hace.</p>
+    </div>
+    <div class="toolbar">
+      <label class="search" for="q">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="Buscar: nube, seguridad, costos, incidentes…" autocomplete="off">
+      </label>
+      <div class="cat-filter" id="catFilter" role="group" aria-label="Filtrar por categoría"></div>
+      <div class="legend" id="legend"><span><i class="dot"></i>Clave para el rol elegido</span><span><i class="dot o"></i>Complementaria</span></div>
+    </div>
+    <div class="skills-layout">
+      <div class="groups" id="groups"></div>
+      <aside class="detail" id="detail" aria-live="polite" aria-label="Detalle de la habilidad"></aside>
+    </div>
+  </div>
+</section>
+
+<section id="trayectoria" class="sec" aria-labelledby="tray-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Trayectoria</span>
+      <h2 id="tray-h">Más de dos décadas, de soporte técnico a la nube</h2>
+      <p>Cada barra muestra cuánto duró cada etapa. Las que se resaltan son las más relevantes para el rol elegido. Tocá una para ir a su detalle.</p>
+    </div>
+    <div class="gantt" id="gantt" role="list" aria-label="Línea de tiempo laboral"></div>
+    <div class="jobs" id="jobs"></div>
+  </div>
+</section>
+
+<section id="formacion" class="sec" aria-labelledby="form-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Formación</span>
+      <h2 id="form-h">Certificaciones y cursos</h2>
+      <p>Formación continua en nube, contenedores, automatización y costos, de la más reciente a la más antigua.</p>
+    </div>
+    <div class="certs" id="certs"></div>
+    <div class="edu">
+      <div><b>Analista de Sistemas</b><span>IADES · 2020 – 2022 · 2.º año aprobado, con foco en redes y soluciones IT</span></div>
+      <div><b>Idioma</b><span>Inglés intermedio: lectura técnica y comunicación operativa</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="contacto" class="contact" aria-labelledby="con-h">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">Contacto</span>
+      <h2 id="con-h" style="margin-top:14px">Conversemos sobre tu próxima búsqueda</h2>
+      <p class="lead2">Disponible para posiciones de SRE, Cloud Engineer, Administración Linux, Jefatura de Soporte y Jefatura de Operaciones.</p>
+    </div>
+    <div class="c-list">
+      <div class="c-item"><div><small>Email</small><span class="v" id="vEmail">gaston.rey.79@gmail.com</span></div><button class="btn" type="button" data-copy="vEmail">Copiar</button></div>
+      <div class="c-item"><div><small>Teléfono</small><span class="v" id="vTel">11 3342-5529</span></div><button class="btn" type="button" data-copy="vTel">Copiar</button></div>
+      <div class="c-item"><div><small>LinkedIn</small><span class="v">linkedin.com/in/gastonrey79</span></div><a class="btn" href="https://www.linkedin.com/in/gastonrey79/" target="_blank" rel="noopener">Abrir</a></div>
+      <div class="c-item c-static"><div><small>Ubicación</small><span class="v">Buenos Aires, Argentina</span></div></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap"><span>Jorge Gastón Rey · Actualizado en noviembre de 2026</span><a href="#inicio">Volver arriba</a></div>
+</footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const norm=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+
+/* ---------- DATOS ---------- */
+const CATS=[
+ {id:'nube',name:'Nube',desc:'Dónde viven los sistemas'},
+ {id:'plat',name:'Plataformas y contenedores',desc:'Cómo se organizan y ejecutan las aplicaciones'},
+ {id:'auto',name:'Automatización y entrega continua',desc:'Hacer en minutos lo que antes llevaba días'},
+ {id:'mon',name:'Monitoreo y observabilidad',desc:'Ver los problemas antes que el cliente'},
+ {id:'sis',name:'Sistemas y seguridad',desc:'Servidores estables y protegidos'},
+ {id:'ges',name:'Gestión y operaciones',desc:'Procesos, equipos y continuidad del servicio'}
+];
+const S=(name,cat,roles,plain,src)=>({name,cat,roles:roles.split(' ').filter(Boolean),plain,src});
+const SKILLS=[
+ S('AWS','nube','sre cloud ops','Amazon Web Services. En lugar de comprar servidores propios, las empresas los alquilan a Amazon y pagan solo por lo que usan.'),
+ S('Google Cloud (GCP)','nube','sre cloud','La nube de Google. Ofrece servidores, bases de datos y servicios equivalentes a los de Amazon.'),
+ S('Azure','nube','cloud','La nube de Microsoft. Tengo formación en sus servicios de ejecución de programas bajo demanda.','Curso Azure Functions esencial (08/2023)'),
+ S('EC2','nube','cloud linux','Servidores virtuales de AWS: computadoras que se encienden y apagan a pedido, sin hardware físico.'),
+ S('EKS','nube','sre cloud','Servicio de AWS que ejecuta Kubernetes ya administrado, para que Amazon se ocupe de la parte más compleja.'),
+ S('ROSA','nube','sre cloud','OpenShift administrado dentro de AWS: una plataforma empresarial lista para usar sobre la nube de Amazon.'),
+ S('ECS','nube','cloud','Servicio de AWS para ejecutar aplicaciones empaquetadas en contenedores.'),
+ S('RDS','nube','cloud','Bases de datos administradas de AWS. Amazon se encarga de respaldos y actualizaciones.'),
+ S('DocumentDB','nube','cloud','Base de datos de AWS pensada para guardar información en formato de documentos.'),
+ S('S3','nube','cloud','Almacenamiento de archivos en la nube de AWS, con muy alta durabilidad.'),
+ S('VPC','nube','cloud','Red privada virtual dentro de la nube. Define qué sistemas pueden comunicarse entre sí.'),
+ S('IAM','nube','cloud sre','Control de accesos: quién puede entrar a qué y qué puede hacer una vez adentro.'),
+ S('Lambda','nube','cloud','Ejecuta pequeños programas solo cuando hacen falta, sin tener servidores encendidos todo el tiempo.'),
+ S('Cloud Functions','nube','cloud','El equivalente de Lambda en Google Cloud.'),
+ S('Balanceadores de carga','nube','cloud sre','Reparten las visitas entre varios servidores para que ninguno se sature.'),
+ S('FinOps','nube','cloud ops','Disciplina para controlar y reducir el costo de la nube sin afectar el servicio.','Curso Ultimate AWS FinOps Cloud Cost Management (12/2025)'),
+
+ S('Kubernetes','plat','sre cloud','Un organizador de contenedores: decide dónde corre cada aplicación, la reemplaza si falla y suma capacidad cuando hay más demanda. Como un controlador de puerto que reparte la carga.'),
+ S('OpenShift','plat','sre cloud linux','Plataforma empresarial de Red Hat construida sobre Kubernetes, con más seguridad y herramientas de administración.'),
+ S('Docker','plat','sre cloud linux','Empaqueta una aplicación con todo lo que necesita para funcionar igual en cualquier lugar, como un contenedor de transporte estándar.'),
+ S('Helm','plat','sre cloud','Gestor de paquetes de Kubernetes: instala una aplicación completa a partir de una configuración reutilizable.'),
+ S('vCenter','plat','linux ops cloud','Administración de servidores virtualizados (VMware) en centros de datos propios.'),
+ S('OpenStack','plat','cloud','Software libre para armar una nube privada dentro de la propia empresa.','Curso OpenStack and DevOps (03/2020)'),
+
+ S('Terraform','auto','sre cloud ops','Permite describir en un archivo toda la infraestructura (servidores, redes, bases de datos) y crearla de forma automática, como una receta repetible.'),
+ S('Jenkins','auto','sre cloud ops','Automatiza las pruebas y la publicación de software. Funciona como una cinta transportadora de entregas.'),
+ S('Argo CD','auto','sre cloud','Mantiene lo que está en producción idéntico a lo aprobado en el repositorio. Cada cambio queda registrado y se puede revertir.'),
+ S('GitLab','auto','sre cloud','Plataforma para guardar código fuente y automatizar su entrega.'),
+ S('CodePipeline','auto','cloud','Servicio de AWS para automatizar el camino que recorre un cambio hasta llegar a producción.'),
+ S('Ansible','auto','linux sre','Configura muchos servidores a la vez con las mismas reglas, sin hacerlo uno por uno.','Listado entre mis competencias técnicas'),
+ S('Python','auto','linux sre','Lenguaje de programación que uso para automatizar tareas y ahorrar trabajo manual al equipo.'),
+ S('Shell scripting','auto','linux sre','Programas cortos de línea de comandos para automatizar tareas repetitivas en servidores.'),
+ S('Vault','auto','sre cloud linux','Bóveda digital de secretos: guarda contraseñas y claves de forma segura y controlada.'),
+
+ S('Prometheus','mon','sre','Recolecta métricas de los sistemas a cada instante para detectar anomalías.'),
+ S('Grafana','mon','sre ops','Tableros visuales que muestran la salud de los sistemas de un vistazo.'),
+ S('CloudWatch','mon','sre cloud','Monitoreo y alertas de AWS: avisa cuando algo se sale de lo normal.'),
+ S('Splunk','mon','sre soporte linux','Búsqueda y análisis de registros (logs) para encontrar la causa de una falla.'),
+ S('Jira','mon','soporte ops sre','Seguimiento de tareas e incidentes: qué pasó, quién lo atiende y en qué estado está.'),
+
+ S('Linux','sis','linux sre','El sistema operativo sobre el que corre la mayor parte de los servidores del mundo.'),
+ S('Unix','sis','linux soporte','Familia de sistemas operativos empresariales de la que descienden Linux y otros.'),
+ S('Hardening','sis','linux sre','Endurecer un servidor: cerrar puertas innecesarias y aplicar reglas de seguridad para reducir riesgos.'),
+ S('Troubleshooting','sis','linux sre soporte','Diagnóstico de fallas: seguir las pistas hasta dar con la causa real y resolverla.'),
+ S('Gestión de certificados','sis','linux sre ops','Controlar y renovar los certificados digitales que protegen las conexiones. Si vencen, el servicio deja de funcionar.'),
+ S('IBM MQ','sis','linux soporte','Sistema de mensajería que permite que aplicaciones empresariales se pasen información de forma confiable.','Curso IBM MQ (02/2019)'),
+
+ S('Gestión de incidentes','ges','sre soporte ops','Atender y resolver fallas del servicio con orden: detectar, priorizar, solucionar y dejar registro.'),
+ S('Escalamiento Nivel 2/3','ges','soporte ops','Ser el punto técnico al que se derivan los casos que el primer nivel de soporte no puede resolver.'),
+ S('Cumplimiento de SLAs','ges','soporte ops','Cumplir los compromisos de tiempos de respuesta y disponibilidad acordados con el negocio.','Eje de mi perfil de gestión'),
+ S('Documentación operativa','ges','soporte ops','Dejar por escrito cómo se opera cada sistema, para que el equipo no dependa de una sola persona.','Eje de mi perfil de gestión'),
+ S('Mesa de ayuda','ges','soporte','Primera línea de atención al usuario: recibir consultas y problemas y encaminarlos.'),
+ S('Capacitación técnica','ges','soporte','Formar a otras personas del equipo para que resuelvan por sí mismas.'),
+ S('Mejora continua','ges','ops soporte sre','Revisar lo que falló o fue lento y ajustar el proceso para que no se repita.','Competencia clave de gestión'),
+ S('Alta disponibilidad','ges','sre ops cloud','Diseñar los sistemas para que sigan funcionando aunque una parte falle.'),
+ S('Continuidad operativa','ges','ops sre','Asegurar que el negocio pueda seguir operando ante fallas o cambios.'),
+ S('Infraestructura híbrida','ges','ops cloud','Trabajar a la vez con servidores propios (on-premise) y con la nube.'),
+ S('Estandarización de procesos','ges','ops soporte','Unificar la forma de entregar y operar para que sea predecible y repetible.')
+];
+
+const JOBS=[
+ {id:'swiss',org:'Swiss Medical',short:'Swiss Medical',role:'SRE · Referente de Operaciones Cloud',period:'05/2025 – 11/2026',start:2025.33,end:2026.88,
+  plain:'Mantengo funcionando y optimizo los sistemas en la nube de una empresa de salud, y atiendo los incidentes cuando algo falla.',
+  roles:['sre','cloud','linux','ops'],
+  bullets:['Operación y optimización de entornos AWS y Google Cloud (EKS, ROSA, RDS, ECS, DocumentDB, EC2, VPC, IAM, Cloud Functions, balanceadores, S3 y Terraform).','Administración avanzada de Linux: troubleshooting y hardening.','Gestión y soporte de OpenShift y Kubernetes: despliegues, operators, redes y clústeres.','Monitoreo y observabilidad con CloudWatch, Prometheus y Grafana.','Gestión de incidentes y tareas operativas en Jira.'],
+  tags:['AWS','Google Cloud (GCP)','EKS','ROSA','RDS','ECS','DocumentDB','EC2','VPC','IAM','Cloud Functions','Balanceadores de carga','S3','Terraform','Linux','Hardening','Troubleshooting','Kubernetes','OpenShift','CloudWatch','Prometheus','Grafana','Jira','Gestión de incidentes']},
+ {id:'jgm',org:'Jefatura de Gabinete de Ministros',short:'Jefatura de Gabinete',role:'DevOps · Administrador OpenShift y Kubernetes',period:'02/2021 – Presente',start:2021.08,end:2026.88,current:true,
+  plain:'Responsable de que las plataformas del organismo estén disponibles y seguras, y de que las nuevas versiones se publiquen sin interrupciones.',
+  roles:['sre','cloud','linux','ops'],
+  bullets:['Administración de OpenShift y despliegue de aplicaciones en entornos Kubernetes con Docker.','Configuración y administración de Jenkins para prácticas de integración y entrega continua.','Administración de infraestructura en AWS y conocimientos básicos de GCP.','Shell scripting y gestión de certificados del clúster.','Estandarización de la entrega continua y automatización de tareas recurrentes.'],
+  tags:['OpenShift','Kubernetes','Docker','Jenkins','AWS','Google Cloud (GCP)','Shell scripting','Gestión de certificados','Linux','Estandarización de procesos']},
+ {id:'america',org:'America Group · Cliente: La Caja',short:'America Group',role:'Consultor DevOps',period:'06/2024 – 08/2025',start:2024.42,end:2025.67,
+  plain:'Como consultor externo, cuidé la continuidad de los sistemas productivos y de desarrollo de un cliente.',
+  roles:['sre','cloud','ops','linux'],
+  bullets:['Consultoría DevOps enfocada en entornos productivos y de desarrollo.','Administración de infraestructura sobre AWS, Kubernetes y vCenter.','Automatización de procesos con Docker, Jenkins y scripting.','Mejora de la eficiencia operativa mediante pipelines de CI/CD y control de incidencias.'],
+  tags:['AWS','Kubernetes','vCenter','Docker','Jenkins','Linux','Shell scripting','Gestión de incidentes','Infraestructura híbrida','Continuidad operativa']},
+ {id:'telecentro',org:'Telecentro',short:'Telecentro',role:'DevOps',period:'09/2023 – 05/2024',start:2023.67,end:2024.42,
+  plain:'Automaticé la publicación de aplicaciones y cuidé la disponibilidad de servicios en una empresa de telecomunicaciones.',
+  roles:['sre','cloud','ops'],
+  bullets:['Gestión de infraestructuras Kubernetes y OpenShift, con despliegues automatizados mediante Helm.','Instalación y configuración de Jenkins y Vault, integrando pipelines con ArgoCD.','Administración de entornos AWS con foco en escalabilidad y eficiencia.','Monitoreo de aplicaciones para garantizar alta disponibilidad.','Optimización de procesos y recursos en entornos cloud y on-premise.'],
+  tags:['Kubernetes','OpenShift','Helm','Jenkins','Vault','Argo CD','AWS','Alta disponibilidad','Infraestructura híbrida']},
+ {id:'coderio',org:'Coderio · Cliente: Cencosud',short:'Coderio · Cencosud',role:'DevOps Engineer',period:'11/2022 – 02/2024',start:2022.83,end:2024.17,
+  plain:'Administré y publiqué servicios de alta demanda para un gran grupo de retail, con entregas automáticas y ordenadas.',
+  roles:['cloud','sre','ops'],
+  bullets:['Administración y despliegue de servicios con Kubernetes, EKS, Docker, AWS, Argo, Helm Chart y GitLab.','Implementación de prácticas de CI/CD para despliegues automatizados y eficientes.','Diseño y configuración de entornos de trabajo con tecnologías actuales.'],
+  tags:['Kubernetes','EKS','Docker','AWS','Argo CD','Helm','GitLab','Alta disponibilidad']},
+ {id:'tag',org:'TagLatam',short:'TagLatam',role:'DevOps Engineer',period:'11/2021 – 08/2022',start:2021.83,end:2022.67,
+  plain:'Desarrollé y publiqué aplicaciones en AWS, automaticé tareas con Python y analicé registros para detectar fallas.',
+  roles:['cloud','sre','linux'],
+  bullets:['Desarrollo y despliegue de aplicaciones en AWS Lambda, EC2, S3, ECS y CodePipeline.','Análisis y monitoreo de registros con Splunk.','Configuración y automatización de flujos de trabajo con Jenkins.','Python y Shell Script para automatizar tareas.'],
+  tags:['AWS','Lambda','EC2','S3','ECS','CodePipeline','Splunk','Jenkins','Python','Shell scripting']},
+ {id:'inaxis',org:'Inaxis · Cliente: Aerolíneas Argentinas',short:'Inaxis · Aerolíneas',role:'DevOps · SysAdmin',period:'03/2020 – 12/2021',start:2020.17,end:2021.92,
+  plain:'Administré el sistema de mensajería que conecta aplicaciones de una aerolínea y automaticé tareas para ahorrar tiempo.',
+  roles:['linux','soporte','ops'],
+  bullets:['Administración de IBM MQ para el manejo de sistemas de mensajería.','Shell scripting y automatización con Python para mejorar la eficiencia.','Jenkins para integración continua y gestión de flujos de trabajo.'],
+  tags:['IBM MQ','Shell scripting','Python','Jenkins']},
+ {id:'practia',org:'Practia Global · Cliente: Telefónica',short:'Practia · Telefónica',role:'DevOps · SysAdmin · Soporte Unix Nivel 2',period:'02/2017 – 12/2019',start:2017.08,end:2019.92,
+  plain:'Fui el punto técnico de segundo nivel para resolver incidentes en los sistemas de Movistar.',
+  roles:['linux','soporte','ops'],
+  bullets:['Soporte de nivel 2 en Unix y OSB para Movistar: resolución de incidencias y optimización de la infraestructura.','Automatización con Shell scripting para agilizar procesos de producción y mejorar la eficiencia operativa.'],
+  tags:['Unix','Shell scripting','Escalamiento Nivel 2/3','Gestión de incidentes']},
+ {id:'previa',org:'Trayectoria previa',short:'Soporte técnico (previo)',role:'Soporte técnico · Administración de servidores',period:'08/2003 – 02/2017',start:2003.58,end:2017.08,
+  plain:'Mis comienzos: atención a usuarios, mantenimiento de equipos y redes y, de a poco, administración de servidores Linux y Unix.',
+  roles:['soporte','linux','ops'],
+  bullets:['Supervisión y ejecución de operaciones de mesa de ayuda y soporte técnico integral a usuarios.','Mantenimiento del parque informático y administración de redes.','Capacitación técnica a personal y coordinación de tareas de soporte.','Evolución hacia la administración de servidores Linux y Unix, y monitoreo de servicios.'],
+  tags:['Mesa de ayuda','Capacitación técnica','Linux','Unix','Gestión de incidentes']}
+];
+
+const ROLES=[
+ {id:'all',label:'Vista general',hint:'Todo el perfil',title:'Perfil integral de infraestructura y operaciones',
+  simple:'Más de 20 años cuidando que los sistemas de empresas grandes funcionen sin interrupciones: desde el soporte técnico hasta la nube.',
+  points:['Más de dos décadas de experiencia, de soporte a usuarios a infraestructura crítica en la nube.','Trabajo con las tres nubes principales: AWS, Google Cloud y Azure.','Certificación de Google Professional Cloud DevOps Engineer (04/2026).','Experiencia en organismos públicos y en empresas de salud, telecomunicaciones, retail y aviación.'],
+  keys:['AWS','Kubernetes','OpenShift','Linux','Terraform','Jenkins','Gestión de incidentes','FinOps']},
+ {id:'sre',label:'SRE',hint:'Que nada se caiga',title:'Site Reliability Engineer (SRE)',
+  simple:'Me aseguro de que los servicios digitales estén siempre disponibles y rápidos, y actúo cuando algo falla antes de que lo note el cliente.',
+  points:['Referente SRE en Swiss Medical sobre AWS y Google Cloud (2025 – 2026).','Monitoreo permanente con Prometheus, Grafana y CloudWatch.','Gestión de incidentes complejos en Jira.','Entrega continua automatizada con Argo CD y Jenkins.','Certificación Google Professional Cloud DevOps Engineer (04/2026).'],
+  keys:['Kubernetes','OpenShift','Prometheus','Grafana','CloudWatch','Terraform','Argo CD','Gestión de incidentes']},
+ {id:'cloud',label:'Cloud Engineer',hint:'Infraestructura en la nube',title:'Cloud Engineer',
+  simple:'Diseño, armo y mantengo la infraestructura en la nube donde funcionan las aplicaciones de una empresa, cuidando también su costo.',
+  points:['Operación de EKS, ROSA, RDS, ECS, DocumentDB, EC2, VPC, IAM y S3 en AWS, y Cloud Functions en Google Cloud.','Infraestructura como código con Terraform.','Cursos Architecting on AWS y Advanced Architecting on AWS.','Formación en gestión de costos cloud (AWS FinOps, 12/2025).'],
+  keys:['AWS','Google Cloud (GCP)','EKS','Terraform','VPC','IAM','FinOps','Kubernetes']},
+ {id:'linux',label:'Admin Linux',hint:'Servidores seguros',title:'Administrador Linux',
+  simple:'Administro y protejo servidores Linux y Unix: que estén actualizados, seguros y que se recuperen rápido si algo sale mal.',
+  points:['Administración avanzada de Linux, troubleshooting y hardening.','Soporte de nivel 2 en Unix para Movistar (2017 – 2019).','Automatización con Shell scripting, Python y Ansible.','Desde 2003, evolución progresiva hacia la administración de servidores Linux y Unix.'],
+  keys:['Linux','Unix','Hardening','Troubleshooting','Shell scripting','Python','Ansible','Gestión de certificados']},
+ {id:'soporte',label:'Jefe de Soporte',hint:'Equipo y respuesta',title:'Jefe de Soporte Técnico',
+  simple:'Coordino el trabajo del equipo para que cada usuario reciba una respuesta rápida y que los problemas graves se resuelvan con orden.',
+  points:['Entre 2003 y 2017: supervisión de operaciones de mesa de ayuda, soporte integral y capacitación técnica.','Punto de escalamiento de nivel 2 para incidentes críticos (2017 – 2022).','Gestión de incidentes en Jira y documentación operativa.','Estandarización de procesos y cumplimiento de niveles de servicio (SLA).'],
+  keys:['Mesa de ayuda','Escalamiento Nivel 2/3','Gestión de incidentes','Cumplimiento de SLAs','Documentación operativa','Capacitación técnica','Jira','Mejora continua']},
+ {id:'ops',label:'Jefe de Operaciones',hint:'Continuidad y costos',title:'Jefe de Operaciones IT',
+  simple:'Garantizo que la tecnología de la empresa funcione de forma estable, con procesos claros, costos bajo control y servicio acorde a lo prometido.',
+  points:['Continuidad operativa de entornos productivos sobre infraestructura híbrida (consultoría para La Caja).','Estabilidad operativa, seguridad y certificados en los clústeres de Jefatura de Gabinete.','Optimización de costos cloud: curso AWS FinOps (12/2025).','Estandarización de procesos de entrega continua y mejora continua.'],
+  keys:['Continuidad operativa','Cumplimiento de SLAs','FinOps','Alta disponibilidad','Infraestructura híbrida','Estandarización de procesos','Gestión de incidentes','Mejora continua']}
+];
+
+const CERTS=[
+ ['Professional Cloud DevOps Engineer Certification','Google','04/2026','Nube',true],
+ ['Ultimate AWS FinOps Cloud Cost Management Masterclass','Udemy','12/2025','Costos cloud'],
+ ['Google Cloud Platform (GCP) Fundamentals for Beginners','Udemy','09/2025','Nube'],
+ ['Kubernetes para administradores IT esencial','LinkedIn Learning','11/2023','Contenedores'],
+ ['Azure Functions esencial','LinkedIn Learning','08/2023','Nube'],
+ ['Architecting on AWS','Amazon Web Services','02/2022','Nube'],
+ ['Advanced Architecting on AWS','Amazon Web Services','11/2021','Nube'],
+ ['OpenShift Administrator','Red Hat','11/2020','Contenedores'],
+ ['OpenStack and DevOps','Educación IT','03/2020','Nube privada'],
+ ['IBM MQ','Udemy','02/2019','Mensajería'],
+ ['Python Programming','Educación IT','02/2018','Programación']
+];
+
+/* ---------- ESTADO ---------- */
+const state={role:'all',cat:'all',q:'',sel:'Kubernetes'};
+const role=()=>ROLES.find(r=>r.id===state.role);
+const isRel=s=>state.role!=='all'&&s.roles.includes(state.role);
+const skillByName=n=>SKILLS.findIndex(s=>s.name===n);
+const toast=(t)=>{const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2200)};
+
+/* ---------- ROLES ---------- */
+function renderRoleTabs(){
+  $('#roleTabs').innerHTML=ROLES.map(r=>`<button class="role-btn" type="button" data-role="${r.id}" aria-pressed="${r.id===state.role}"><span class="rb-t">${r.label}</span><span class="rb-h">${r.hint}</span></button>`).join('');
+}
+const CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" opacity=".25"/><path d="m8 12.5 2.8 2.8L16.5 9"/></svg>';
+function renderRolePanel(animate){
+  const r=role();
+  $('#rpTitle').textContent=r.title;
+  $('#rpSimple').textContent=r.simple;
+  $('#rpPoints').innerHTML=r.points.map(p=>`<li>${CHECK}<span>${p}</span></li>`).join('');
+  $('#rpKeys').innerHTML=r.keys.map(n=>`<button class="chip key" type="button" data-skill="${skillByName(n)}">${n}</button>`).join('');
+  const rel=state.role==='all'?JOBS.slice(0,3):JOBS.filter(j=>j.roles.includes(state.role)).slice(0,3);
+  $('#rpJobs').innerHTML=rel.map(j=>`<button class="chip link" type="button" data-job="${j.id}">${j.short}</button>`).join('');
+  const total=SKILLS.length,n=state.role==='all'?total:SKILLS.filter(isRel).length;
+  $('#rpCount').textContent=state.role==='all'?`${total} habilidades en el mapa.`:`${n} de ${total} habilidades del mapa son clave para este rol.`;
+  if(animate){const p=$('#rolePanel');p.classList.remove('flash');void p.offsetWidth;p.classList.add('flash')}
+  $('#navRole').innerHTML=`Viendo: <b>${r.label}</b>`;
+  $$('#roleTabs .role-btn').forEach(b=>b.setAttribute('aria-pressed',b.dataset.role===state.role));
+  $('#legend').style.display=state.role==='all'?'none':'';
+}
+
+/* ---------- HABILIDADES ---------- */
+function renderCats(){
+  const items=[{id:'all',name:'Todas'}].concat(CATS);
+  $('#catFilter').innerHTML=items.map(c=>`<button class="chip ${c.id===state.cat?'sel':''}" type="button" data-cat="${c.id}" aria-pressed="${c.id===state.cat}">${c.name}</button>`).join('');
+}
+function renderSkills(){
+  const q=norm(state.q.trim());let shown=0;const out=[];
+  CATS.forEach(c=>{
+    if(state.cat!=='all'&&state.cat!==c.id)return;
+    let list=SKILLS.map((s,i)=>({s,i})).filter(o=>o.s.cat===c.id&&(!q||norm(o.s.name+' '+o.s.plain).includes(q)));
+    if(!list.length)return;
+    if(state.role!=='all')list.sort((a,b)=>isRel(b.s)-isRel(a.s));
+    shown+=list.length;
+    out.push(`<div class="group"><header><h3>${c.name}</h3><span>${c.desc}</span></header><div class="chips">${list.map(o=>{
+      const rel=isRel(o.s),sel=o.s.name===state.sel;
+      const cls=['chip',rel?'rel':'',state.role!=='all'&&!rel?'dim':'',sel?'sel':''].join(' ');
+      return `<button class="${cls}" type="button" data-i="${o.i}" aria-pressed="${sel}">${o.s.name}</button>`}).join('')}</div></div>`);
+  });
+  $('#groups').innerHTML=shown?out.join(''):`<div class="empty">No encontré habilidades con "${state.q.replace(/[<>&]/g,'')}". Probá con otra palabra, como nube, seguridad o costos.</div>`;
+}
+function renderDetail(){
+  const i=skillByName(state.sel),s=SKILLS[i];
+  if(!s){$('#detail').innerHTML='<p class="plain">Tocá una habilidad para ver qué significa.</p>';return}
+  const cat=CATS.find(c=>c.id===s.cat).name;
+  const used=JOBS.filter(j=>j.tags.includes(s.name));
+  const keyFor=ROLES.filter(r=>r.id!=='all'&&s.roles.includes(r.id));
+  $('#detail').innerHTML=`<button class="close" type="button" id="dClose" aria-label="Cerrar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  <span class="tag-label">${cat}</span><h3>${s.name}</h3><p class="plain">${s.plain}</p>
+  <div class="meta"><span class="tag-label">Clave para</span><div class="pills">${keyFor.map(r=>`<button class="pill" type="button" data-role-pick="${r.id}">${r.label}</button>`).join('')}</div></div>
+  <div class="meta"><span class="tag-label">Dónde lo apliqué</span><div class="pills">${used.length?used.map(j=>`<button class="pill" type="button" data-job="${j.id}">${j.short}</button>`).join(''):''}${s.src?`<span class="pill warm">${s.src}</span>`:''}${!used.length&&!s.src?'<span class="pill">Competencia general</span>':''}</div></div>`;
+}
+function selectSkill(name,opts){
+  state.sel=name;
+  if(opts&&opts.reset){state.q='';state.cat='all';$('#q').value='';renderCats()}
+  renderSkills();renderDetail();
+  if(window.matchMedia('(max-width:899px)').matches)$('#detail').classList.add('open');
+}
+
+/* ---------- TRAYECTORIA ---------- */
+const Y0=2003,Y1=2027;
+const pct=y=>((y-Y0)/(Y1-Y0)*100);
+function renderGantt(){
+  const ticks=[2005,2010,2015,2020,2025];
+  const axis=`<div class="g-axis"><div></div><div class="g-ticks" aria-hidden="true">${ticks.map(t=>`<span style="left:${pct(t)}%">${t}</span>`).join('')}</div></div>`;
+  const rows=JOBS.map(j=>{
+    const rel=state.role==='all'||j.roles.includes(state.role);
+    return `<button class="g-row" type="button" role="listitem" data-job="${j.id}" title="${j.org} · ${j.period}"><span class="g-label"><b>${j.short}</b><small>${j.period}</small></span><span class="g-track"><span class="g-bar ${rel?'rel':''}" style="left:${pct(j.start)}%;width:${Math.max(1.2,pct(j.end)-pct(j.start))}%"></span></span></button>`}).join('');
+  $('#gantt').innerHTML=axis+rows+`<p class="g-note">${state.role==='all'?'Las barras muestran el período de cada etapa.':'En color: etapas con experiencia relevante para '+role().label+'.'}</p>`;
+}
+const ARROW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+function renderJobs(){
+  const open=new Set($$('.job').filter(e=>!e.querySelector('.job-more').hidden).map(e=>e.dataset.id));
+  const first=!$('.job');
+  $('#jobs').innerHTML=JOBS.map((j,k)=>{
+    const rel=state.role!=='all'&&j.roles.includes(state.role);
+    const isOpen=first?k<2:open.has(j.id);
+    return `<article class="job ${rel?'rel':''}" id="job-${j.id}" data-id="${j.id}">
+      <div class="job-top"><div><h3>${j.org}</h3><span class="role">${j.role}</span></div><span class="period">${j.period}</span></div>
+      <div class="badges">${j.current?'<span class="badge warm">Actual</span>':''}${rel?`<span class="badge">Relevante para ${role().label}</span>`:''}</div>
+      <p class="plain">${j.plain}</p>
+      <button class="toggle" type="button" aria-expanded="${isOpen}" aria-controls="more-${j.id}">${isOpen?'Ocultar detalle':'Ver detalle'} ${ARROW}</button>
+      <div class="job-more" id="more-${j.id}" ${isOpen?'':'hidden'}>
+        <ul>${j.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>
+        <div class="tags">${j.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      </div></article>`}).join('');
+}
+function goJob(id){
+  const el=$('#job-'+id);if(!el)return;
+  const more=$('.job-more',el),tg=$('.toggle',el);
+  if(more.hidden){more.hidden=false;tg.setAttribute('aria-expanded','true');tg.firstChild.textContent='Ocultar detalle '}
+  el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'center'});
+  el.classList.remove('hl');void el.offsetWidth;el.classList.add('hl');
+}
+
+/* ---------- FORMACIÓN ---------- */
+function renderCerts(){
+  $('#certs').innerHTML=CERTS.map(c=>`<article class="cert ${c[4]?'feat':''}"><span class="area">${c[3]}${c[4]?' · Certificación':''}</span><h3>${c[0]}</h3><p>${c[1]} · ${c[2]}</p></article>`).join('');
+}
+
+/* ---------- CAMBIO DE ROL ---------- */
+function setRole(id,scroll){
+  state.role=id;
+  renderRolePanel(true);renderSkills();renderDetail();renderGantt();renderJobs();
+  $$('#groups .chip.rel').forEach((c,k)=>{if(k<40){c.classList.add('pop');c.style.animationDelay=(k*18)+'ms'}});
+  if(scroll)$('#roles').scrollIntoView({behavior:'smooth'});
+}
+
+/* ---------- EVENTOS ---------- */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('button,a');if(!t)return;
+  if(t.dataset.role!==undefined&&t.closest('#roleTabs')){setRole(t.dataset.role);return}
+  if(t.dataset.rolePick){setRole(t.dataset.rolePick);return}
+  if(t.dataset.cat){state.cat=t.dataset.cat;renderCats();renderSkills();return}
+  if(t.dataset.skill!==undefined&&t.closest('#rpKeys')){selectSkill(SKILLS[+t.dataset.skill].name,{reset:true});$('#habilidades').scrollIntoView({behavior:'smooth'});return}
+  if(t.dataset.i!==undefined&&t.closest('#groups')){selectSkill(SKILLS[+t.dataset.i].name);return}
+  if(t.dataset.job){goJob(t.dataset.job);return}
+  if(t.id==='dClose'||t.closest('#dClose')){$('#detail').classList.remove('open');return}
+  if(t.classList.contains('toggle')){
+    const more=$('#'+t.getAttribute('aria-controls')),ex=t.getAttribute('aria-expanded')==='true';
+    more.hidden=ex;t.setAttribute('aria-expanded',String(!ex));t.firstChild.textContent=ex?'Ver detalle ':'Ocultar detalle ';return}
+  if(t.dataset.copy){
+    const txt=$('#'+t.dataset.copy).textContent.trim();
+    const fallback=()=>{const r=document.createRange();r.selectNodeContents($('#'+t.dataset.copy));const s=getSelection();s.removeAllRanges();s.addRange(r);toast('Seleccionado: copialo con tu teclado')};
+    try{navigator.clipboard.writeText(txt).then(()=>toast('Copiado'),fallback)}catch(err){fallback()}
+  }
+});
+$('#q').addEventListener('input',e=>{state.q=e.target.value;renderSkills()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#detail').classList.remove('open')});
+
+/* tema */
+function effectiveDark(){const a=document.documentElement.getAttribute('data-theme');return a?a==='dark':matchMedia('(prefers-color-scheme: dark)').matches}
+$('#themeBtn').addEventListener('click',()=>{
+  const next=effectiveDark()?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  try{localStorage.setItem('gr-theme',next)}catch(e){}
+  net.recolor();
+});
+
+/* scroll-spy */
+if('IntersectionObserver' in window){
+  const links=$$('.nav-links a');
+  const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){links.forEach(a=>a.classList.toggle('active',a.dataset.sec===en.target.id))}})},{rootMargin:'-35% 0px -55% 0px'});
+  ['roles','habilidades','trayectoria','formacion','contacto'].forEach(id=>io.observe($('#'+id)));
+}
+
+/* ---------- RED DE NODOS (hero) ---------- */
+const net=(function(){
+  const cv=$('#net'),ctx=cv.getContext('2d');let W=0,H=0,nodes=[],raf=0,visible=true,col='#0a7587';
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)');
+  const readCol=()=>{col=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||col};
+  function size(){
+    const r=cv.parentElement.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);
+    W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;cv.style.width=W+'px';cv.style.height=H+'px';ctx.setTransform(d,0,0,d,0,0);
+    const n=Math.min(64,Math.floor(W*H/15000));
+    nodes=Array.from({length:n},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.28,vy:(Math.random()-.5)*.28,r:1.3+Math.random()*1.7}));
+    draw();
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);ctx.fillStyle=col;ctx.strokeStyle=col;
+    for(let i=0;i<nodes.length;i++){
+      const a=nodes[i];
+      for(let j=i+1;j<nodes.length;j++){
+        const b=nodes[j],dx=a.x-b.x,dy=a.y-b.y,d=dx*dx+dy*dy;
+        if(d<16900){ctx.globalAlpha=(1-d/16900)*.5;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}
+      }
+      ctx.globalAlpha=.9;ctx.beginPath();ctx.arc(a.x,a.y,a.r,0,6.283);ctx.fill();
+    }
+    ctx.globalAlpha=1;
+  }
+  function tick(){
+    if(!visible||document.hidden||reduce.matches){raf=0;return}
+    for(const a of nodes){a.x+=a.vx;a.y+=a.vy;if(a.x<0||a.x>W)a.vx*=-1;if(a.y<0||a.y>H)a.vy*=-1}
+    draw();raf=requestAnimationFrame(tick);
+  }
+  function start(){if(!raf&&!reduce.matches)raf=requestAnimationFrame(tick)}
+  function recolor(){readCol();draw()}
+  readCol();size();start();
+  addEventListener('resize',()=>{size()});
+  document.addEventListener('visibilitychange',start);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener&&matchMedia('(prefers-color-scheme: dark)').addEventListener('change',recolor);
+  if('IntersectionObserver' in window)new IntersectionObserver(es=>{visible=es[0].isIntersecting;if(visible)start()}).observe(cv.parentElement);
+  return {recolor};
+})();
+
+/* ---------- INICIO ---------- */
+renderRoleTabs();renderCats();renderCerts();
+renderRolePanel(false);renderSkills();renderDetail();renderGantt();renderJobs();
+})();
+</script>
+
+</body></html>
